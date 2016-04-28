@@ -17,18 +17,17 @@
  * Contact: Vincent ACARY, siconos-team@lists.gforge.inria.fr
  */
 
-/*! \file  MoreauJeanOSI.hpp */
+/*! \file  MoreauJeanGOSI.hpp */
 
-#ifndef MoreauJeanOSI_H
-#define MoreauJeanOSI_H
+#ifndef MoreauJeanGOSI_H
+#define MoreauJeanGOSI_H
 
 #include "OneStepIntegrator.hpp"
+#include "OneStepNSProblem.hpp"
 
 #include <limits>
 
-const unsigned int MOREAUSTEPSINMEMORY = 1;
-
-/**  \class MoreauJeanOSI
+/**  \class MoreauJeanGOSI 
  *   \brief One Step time Integrator for First Order Dynamical Systems  for
  *    mechanical Systems (LagrangianDS and NewtonEulerDS)
  *   \author SICONOS Development Team - copyright INRIA
@@ -44,7 +43,7 @@ const unsigned int MOREAUSTEPSINMEMORY = 1;
  * \f{equation}{
  * \begin{cases}
  *  M (v_{k+1}-v_k)
- *  + h K q_{k+\theta} + h C v_{k+\theta}     -   h F_{k+\theta} = p_{k+1} = G P_{k+1},\label{eq:MoreauTS-motion}\\[1mm]
+ *  + h K q_{k+\theta} + h C v_{k+\theta}     -   h F_{k+\theta} = p_{k+1} = G P_{k+1},\label{eq:MoreauTS-motion}\\[1mm] 
  *  q_{k+1} = q_{k} + h v_{k+\theta}, \quad \\[1mm]
  *  U_{k+1} = G^\top\, v_{k+1}, \\[1mm]
  *  \begin{array}{lcl}
@@ -53,7 +52,7 @@ const unsigned int MOREAUSTEPSINMEMORY = 1;
  * \end{array}
  * \end{cases} \f}
  * with  \f$\theta \in [0,1]\f$. The index set \f$\mathcal I_1\f$ is the discrete equivalent
- * to the rule that allows us to apply the Signorini  condition at the velocity level.
+ * to the rule that allows us to apply the Signorini  condition at the velocity level. 
  * In the numerical practice, we choose to define this set by
  * \f{equation}{
  *   \label{eq:index-set1}
@@ -63,37 +62,37 @@ const unsigned int MOREAUSTEPSINMEMORY = 1;
  * For more details, we refer to
  *
  * M. Jean and J.J. Moreau. Dynamics in the presence of unilateral contacts and dry friction: a numerical approach.
- * In G. Del Pietro and F. Maceri, editors, Unilateral problems in structural analysis.
+ * In G. Del Pietro and F. Maceri, editors, Unilateral problems in structural analysis. 
  * II, pages 151–196. CISM 304, Spinger Verlag, 1987.
  *
- * J.J. Moreau. Unilateral contact and dry friction in finite freedom dynamics.
- * In J.J. Moreau and Panagiotopoulos P.D., editors, Nonsmooth Mechanics and Applications,
+ * J.J. Moreau. Unilateral contact and dry friction in finite freedom dynamics. 
+ * In J.J. Moreau and Panagiotopoulos P.D., editors, Nonsmooth Mechanics and Applications, 
  * number 302 in CISM, Courses and lectures, pages 1–82. CISM 302, Spinger Verlag, Wien- New York, 1988a.
  *
- * J.J. Moreau. Numerical aspects of the sweeping process.
- * Computer Methods in Applied Mechanics and Engineering, 177:329–349, 1999.
+ * J.J. Moreau. Numerical aspects of the sweeping process. 
+ * Computer Methods in Applied Mechanics and Engineering, 177:329–349, 1999. 
  *
- * M. Jean. The non smooth contact dynamics method.
+ * M. Jean. The non smooth contact dynamics method. 
  * Computer Methods in Applied Mechanics and Engineering, 177:235–257, 1999.
  *
  * and for a review :
  *
- * V. Acary and B. Brogliato. Numerical Methods for Nonsmooth Dynamical Systems:
+ * V. Acary and B. Brogliato. Numerical Methods for Nonsmooth Dynamical Systems: 
  * Applications in Mechanics and Electronics, volume 35 of Lecture Notes in
  * Applied and Computational Mechanics. Springer Verlag, 2008.
  *
- *
- * MoreauJeanOSI class is used to define some time-integrators methods for a
- * list of dynamical systems. A MoreauJeanOSI instance is defined by the value
+ * 
+ * MoreauJeanGOSI class is used to define some time-integrators methods for a
+ * list of dynamical systems. A MoreauJeanGOSI instance is defined by the value
  * of theta and the list of concerned dynamical systems.
  *
  * Each DynamicalSystem is associated to a SiconosMatrix, named "W", the "iteration" matrix"
- * W matrices are initialized and computed in initW and computeW. Depending on the DS type,
+ * W matrices are initialized and computed in initW and computeW. Depending on the DS type, 
  * they may depend on time t and DS state x.
  *
  * For mechanical systems, the implementation uses _p for storing the
- * the input due to the nonsmooth law. This MoreauJeanOSI scheme assumes that the
- * relative degree is two.
+ * the input due to the nonsmooth law. This MoreauJeanGOSI scheme assumes that the
+ * relative degree is two. 
  *
  * For Lagrangian systems, the implementation uses _p[1] for storing the
  * discrete impulse.
@@ -108,12 +107,15 @@ const unsigned int MOREAUSTEPSINMEMORY = 1;
  * See User's guide for details.
  *
  */
-class MoreauJeanOSI : public OneStepIntegrator
+class MoreauJeanGOSI : public OneStepIntegrator
 {
 protected:
   /** serialization hooks
   */
-  ACCEPT_SERIALIZATION(MoreauJeanOSI);
+  ACCEPT_SERIALIZATION(MoreauJeanGOSI);
+
+  /** Stl map that associates the columns of  W MoreauJeanGOSI matrix to each DynamicalSystem of the OSI if it has some boundary conditions */
+  MapOfDSMatrices _WBoundaryConditionsMap;
 
   /** Stl map that associates a theta parameter for the integration
   *  scheme to each DynamicalSystem of the OSI */
@@ -147,11 +149,11 @@ public:
    *  \param theta value for all linked DS (default = 0.5).
    *  \param gamma value for all linked DS (default = NaN and gamma is not used).
    */
-  MoreauJeanOSI(double theta = 0.5, double gamma = std::numeric_limits<double>::quiet_NaN());
+  MoreauJeanGOSI(double theta = 0.5, double gamma = std::numeric_limits<double>::quiet_NaN());
 
   /** destructor
    */
-  virtual ~MoreauJeanOSI() {};
+  virtual ~MoreauJeanGOSI() {};
 
   // --- GETTERS/SETTERS ---
 
@@ -168,11 +170,29 @@ public:
    */
   SP::SimpleMatrix W(SP::DynamicalSystem ds);
 
+  /** set the value of W[ds] to newValue
+   * \param newValue SiconosMatrix
+   * \param ds a pointer to DynamicalSystem,
+   */
+  void setW(const SiconosMatrix& newValue, SP::DynamicalSystem ds);
+
+  /** set W[ds] to pointer newPtr
+   * \param newPtr
+   * \param ds a pointer to DynamicalSystem
+   */
+  void setWPtr(SP::SimpleMatrix newPtr, SP::DynamicalSystem ds);
 
   // -- WBoundaryConditions --
 
+  /** get WBoundaryConditions map
+   *  \return a MapOfDSMatrices
+   */
+  inline MapOfDSMatrices getWBoundaryConditionsMap() const
+  {
+    return _WBoundaryConditionsMap;
+  };
 
-  /** Get the value of WBoundaryConditions corresponding to DynamicalSystem ds
+  /** get the value of WBoundaryConditions corresponding to DynamicalSystem ds
    * \param ds a pointer to DynamicalSystem, optional, default =
    * NULL. get WBoundaryConditions[0] in that case
    *  \return SimpleMatrix
@@ -276,37 +296,34 @@ public:
 
   // --- OTHER FUNCTIONS ---
 
-  /** initialization of the MoreauJeanOSI integrator; for linear time
+  /** initialization of the MoreauJeanGOSI integrator; for linear time
       invariant systems, we compute time invariant operator (example :
       W)
    */
   virtual void initialize(Model& m);
 
-  /** init W MoreauJeanOSI matrix at time t
+  /** init W MoreauJeanGOSI matrix at time t
    *  \param time
    *  \param ds a pointer to DynamicalSystem
-   *  \param dsv a descriptor of the ds on the graph (redundant to avoid invocation)
    */
   void initW(double time, SP::DynamicalSystem ds, DynamicalSystemsGraph::VDescriptor& dsv);
 
-  /** compute W MoreauJeanOSI matrix at time t
+  /** compute W MoreauJeanGOSI matrix at time t
    *  \param time (double)
    *  \param ds a pointer to DynamicalSystem
-   *  \param W the result in W
+   *  \param W the matrix to compute
    */
-  void computeW(double time , SP::DynamicalSystem ds, SiconosMatrix& W);
+  void computeW(double time, SP::DynamicalSystem ds,  SiconosMatrix& W);
 
-  /** compute WBoundaryConditionsMap[ds] MoreauJeanOSI matrix at time t
+  /** compute WBoundaryConditionsMap[ds] MoreauJeanGOSI matrix at time t
    *  \param ds a pointer to DynamicalSystem
-   *  \param WBoundaryConditions write the result in WBoundaryConditions
    */
-  void computeWBoundaryConditions(SP::DynamicalSystem ds, SiconosMatrix& WBoundaryConditions);
+  void computeWBoundaryConditions(SP::DynamicalSystem ds);
 
-  /** init WBoundaryConditionsMap[ds] MoreauJeanOSI
+  /** init WBoundaryConditionsMap[ds] MoreauJeanGOSI
    *  \param ds a pointer to DynamicalSystem
-   *  \param dsv a descriptor of the ds on the graph (redundant)
    */
-  void initWBoundaryConditions(SP::DynamicalSystem ds, DynamicalSystemsGraph::VDescriptor& dsv);
+  void initWBoundaryConditions(SP::DynamicalSystem ds);
 
 
   /** compute the initial state of the Newton loop.
@@ -314,7 +331,7 @@ public:
   void computeInitialNewtonState();
 
 
-  /** return the maximum of all norms for the "MoreauJeanOSI-discretized" residus of DS
+  /** return the maximum of all norms for the "MoreauJeanGOSI-discretized" residus of DS
       \return a double
    */
   double computeResidu();
@@ -328,7 +345,7 @@ public:
    * \param vertex_inter vertex of the interaction graph
    * \param osnsp pointer to OneStepNSProblem
    */
-  virtual void computeFreeOutput(InteractionsGraph::VDescriptor& vertex_inter, OneStepNSProblem* osnsp);
+//  virtual void computeFreeOutput(InteractionsGraph::VDescriptor& vertex_inter, OneStepNSProblem* osnsp);
 
   /** Apply the rule to one Interaction to known if is it should be included
    * in the IndexSet of level i
@@ -357,7 +374,7 @@ public:
    *  \param tinit the initial time
    *  \param tend the end time
    *  \param tout the real end time
-   *  \param notUsed useless flag (for MoreauJeanOSI, used in LsodarOSI)
+   *  \param notUsed useless flag (for MoreauJeanGOSI, used in LsodarOSI)
    */
   void integrate(double& tinit, double& tend, double& tout, int& notUsed);
 
@@ -371,7 +388,13 @@ public:
    */
   virtual void updateState(const unsigned int level);
 
-  /** Displays the data of the MoreauJeanOSI's integrator
+  /** Compute the nonsmooth law contribution
+   * \param inter the interaction (for y_k)
+   * \param osnsp the non-smooth integrator
+   */
+  void NSLcontrib(Interaction& inter, OneStepNSProblem& osnsp);
+
+  /** Displays the data of the MoreauJeanGOSI's integrator
    */
   void display();
 
@@ -381,4 +404,4 @@ public:
 
 };
 
-#endif // MoreauJeanOSI_H
+#endif // MoreauJeanGOSI_H
